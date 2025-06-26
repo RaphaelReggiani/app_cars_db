@@ -1,0 +1,43 @@
+{% extends "default.html" %}
+
+{% load static %}
+
+{% block 'body' %}
+
+    <div class="min-h-screen px-4 py-10 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static "images/Background_app_psicologia.jpg" %}'); background-color: rgba(255, 255, 255, 0.5); background-size: 110% 110%; background-blend-mode: overlay;">
+
+        <div class="w-full flex flex-col items-center">
+
+            <h2 class="ml-5 text-pretty text-3xl flex items-left justify-left font-semibold tracking-tight text-purple-900 sm:text-4xl">REGISTERED CARS</h2>
+
+            <div class="mt-6 mb-5 flex flex-col gap-1 w-3/4">
+                <hr class="border-t-2 border-purple-800">
+                <hr class="border-t-2 border-purple-400">
+            </div>
+
+            <ul role="list" class="mt-10 grid gap-x-20 gap-y-12 sm:grid-cols-3 sm:gap-y-16 xl:col-span-3">
+
+                {% for car in car_main %}
+                    <li>
+                    <div class="px-12 flex items-center gap-x-6">
+                        <img class="size-35 rounded-full border-3 border-purple-500 shadow-lg" src="{{car.car_photo.url}}" alt="">
+                        <div>
+                        <a href="{% url 'show_car' car.id %}" class="text-base/7 font-semibold tracking-tight text-purple-900">{{car.car_name}}</a>
+                        <p class="text-sm/6 font-semibold text-purple-500">{{car.car_brand}}</p>
+                        </div>
+                    </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+    </div>
+    
+{% endblock 'body' %}
+
+{% block 'footer' %}
+<footer class="bg-purple-900 text-purple-50 text-center py-4">
+  © 2025 Cars Database - All rights reserved.
+</footer>
+{% endblock 'footer' %}

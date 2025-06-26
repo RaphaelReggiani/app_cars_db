@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    {% block 'head' %}{% endblock 'head' %}
+</head>
+<body class="pt-16">
+    <header class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-purple-700 via-purple-850 to-purple-950 shadow">
+        <nav class="flex items-center justify-between p-4 lg:px-8" aria-label="Global">
+          <div class="flex lg:flex-1">
+            <a href="#" class="-m-1.5 p-1.5">
+              <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="">
+            </a>
+          </div>
+          <div class="flex lg:hidden">
+            <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-purple-700">
+              <span class="sr-only">Open main menu</span>
+              <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="ml-5 absolute left-4 flex items-center">
+            <div class="rounded-full border-2 border-purple-100 text-purple-50 w-12 h-12 flex items-center justify-center font-bold text-sm">
+              <a href="{% url 'home' %}">CARS</a>
+            </div>
+          </div>
+
+          <div class="hidden lg:flex lg:gap-x-12">
+            <a class="text-xl font-medium text-purple-100 hover:text-purple-50 tracking-wide transition-colors duration-300">CARS DATA BASE</a>
+          </div>
+          <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+
+          </div>
+        </nav>
+    
+      </header>
+
+    {% block 'body' %}{% endblock 'body' %}
+</body>
+<footer>
+    {% block 'footer' %}{% endblock 'footer' %}
+</footer>
+</html>

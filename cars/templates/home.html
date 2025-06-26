@@ -1,0 +1,52 @@
+{% extends "default.html" %}
+
+{% load static %}
+
+{% block 'body' %}
+
+<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static "images/Background_app_psicologia.jpg" %}'); background-color: rgba(255, 255, 255, 0.5); background-size: 110% 110%; background-blend-mode: overlay;">
+  <div class="max-w-3xl w-full space-y-20 text-center">
+
+    <div class="bg-transparent rounded-xl border-2 border-purple-700 shadow-lg shadow-purple-300 p-8">
+
+      <h2 class="uppercase text-4xl sm:text-5xl font-bold tracking-wide text-purple-900 leading-[3.5rem]">
+        WELCOME TO CARS DATABASE APP
+      </h2>
+
+      <p class="mt-5 text-lg sm:text-xl text-purple-800">
+        TO REGISTER OR CONSULT OUR DATABASE, PLEASE SELECT ONE OF THESE OPTIONS:
+      </p>
+    
+    </div>
+
+    <div class="flex justify-center gap-25">
+ 
+      <form method="get" action="{% url 'cars' %}">
+        
+        <button type="submit" class="mt-15 inline-flex justify-center rounded-md cursor-pointer bg-purple-900 px-5 py-4 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600">
+          REGISTER NEW CAR
+        </button>
+        
+      </form>
+
+      <form method="get" action="{% url 'all_cars' %}">
+        
+        <button type="submit" class="mt-15 inline-flex justify-center rounded-md cursor-pointer bg-purple-900 px-5 py-4 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600">
+          ALL REGISTERED CARS
+        </button>
+        
+      </form>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock 'body' %}
+
+
+{% block 'footer' %}
+<footer class="bg-purple-900 text-purple-50 text-center py-4">
+  © 2025 Cars Database - All rights reserved.
+</footer>
+{% endblock 'footer' %}
