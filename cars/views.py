@@ -1,14 +1,143 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
-from .models import Cars, Tags, Cardata, Tier, Color, WheelSize, Country
+from .models import Cars, Tags, Cardata, Tier, Color, WheelSize, Country, NewUser
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.db.models import Q
+from django.core.exceptions import ValidationError
+import re
+from collections import Counter
+from django.contrib.auth.models import User
 import datetime
+from .forms import SignUpForm, LoginForm, FinalizeUserForm
 
 
 def home(request):
     return render(request, 'home.html')
+
+def user_auth(request):
+
+    signup_form = SignUpForm(prefix='signup')
+    login_form = LoginForm(prefix='login')
+    return render(request, 'user.html', {
+        'signup_form': signup_form,
+        'login_form': login_form,
+        'user_countries': NewUser.user_country_choices,
+        'user_months': NewUser.user_month_choices,
+        'user_days': NewUser.user_day_choices,
+        'user_years': NewUser.user_year_choices
+    })
+
+def user_pre_register(request):
+    if request.method == 'POST':
+        signup_form = SignUpForm(request.POST)
+        if signup_form.is_valid():
+            cleaned_data = signup_form.cleaned_data
+
+            request.session['pre_user_data'] = {
+                'user_name': cleaned_data['user_name'],
+                'user_email': cleaned_data['user_email'],
+                'user_phone': cleaned_data['user_phone'],
+                'user_country': cleaned_data['user_country'],
+                'user_age_month': cleaned_data['user_age_month'],
+                'user_age_day': cleaned_data['user_age_day'],
+                'user_age_year': cleaned_data['user_age_year'],
+            }
+
+            return redirect('user_finalize_register')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            login_form = LoginForm(prefix='login')
+            return render(request, 'user.html', {
+                'signup_form': signup_form,
+                'login_form': login_form,
+                'user_countries': NewUser.user_country_choices,
+                'user_months': NewUser.user_month_choices,
+                'user_days': NewUser.user_day_choices,
+                'user_years': NewUser.user_year_choices
+            })
+    return redirect('user')
+
+
+def user_finalize_register(request):
+    pre_user_data = request.session.get('pre_user_data')
+    if not pre_user_data:
+        messages.error(request, "Please complete the first step before finalizing registration.")
+        return redirect('user')
+    
+    success = False
+
+    if request.method == 'POST':
+        form = FinalizeUserForm(request.POST)
+        if form.is_valid():
+            user_nickname = form.cleaned_data['user_nickname']
+
+            if NewUser.objects.filter(user_nickname=user_nickname).exists():
+                messages.error(request, 'Nickname already taken. Please choose another one.')
+            else:
+
+                user = NewUser(
+                    user_name=pre_user_data['user_name'],
+                    user_email=pre_user_data['user_email'],
+                    user_phone=pre_user_data['user_phone'],
+                    user_country=pre_user_data['user_country'],
+                    user_age_month=pre_user_data['user_age_month'],
+                    user_age_day=pre_user_data['user_age_day'],
+                    user_age_year=pre_user_data['user_age_year'],
+                    user_nickname=user_nickname,
+                    user_password=form.cleaned_data['user_password'],
+                )
+                user.save()
+
+                del request.session['pre_user_data']
+
+                messages.success(request, 'User registered successfully!')
+                success = True
+        else:
+            messages.error(request, 'Username already exists, insert another one.')
+    else:
+        form = FinalizeUserForm()
+
+    return render(request, 'user_register.html', {'form': form, 'success': success})
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .models import NewUser
+
+def user_login(request):
+    if request.method == 'POST':
+        user_nickname = request.POST.get('user_nickname')
+        user_password = request.POST.get('user_password')
+
+        try:
+            user = NewUser.objects.get(user_nickname=user_nickname)
+            if user.user_password == user_password:
+
+                request.session['user_id'] = user.id
+                request.session['user_nickname'] = user.user_nickname
+
+                messages.success(request, f'Welcome back, {user.user_nickname}!')
+                return redirect('home')
+            else:
+                messages.error(request, 'Incorrect password.')
+        except NewUser.DoesNotExist:
+            messages.error(request, 'User not found.')
+
+    signup_form = SignUpForm(prefix='signup')
+    login_form = LoginForm(prefix='login')
+    return render(request, 'user.html', {
+        'signup_form': signup_form,
+        'login_form': login_form,
+        'user_countries': NewUser.user_country_choices,
+        'user_months': NewUser.user_month_choices,
+        'user_days': NewUser.user_day_choices,
+        'user_years': NewUser.user_year_choices
+    })
+
+def user_logout(request):
+    request.session.flush()
+    messages.success(request, 'You have been logged out.')
+    return redirect('home')
 
 def cars(request):
 
@@ -47,11 +176,6 @@ def car_view(request, id):
     car = Cars.objects.get(id=id)
     car_data = Cardata.objects.filter(car=car).last()
     if request.method == "GET":
-        tags_car_information = Tags.objects.all()
-        tiers_car_information = Tier.objects.all()
-        color_car_information = Color.objects.all()
-        wheel_size_car_information = WheelSize.objects.all()
-        country_car_information = Country.objects.all()
         return render(request, 'car.html', {'car' : car, 'car_data': car_data, 'tags_choices' : Tags.tags_choices, 'tiers_choices' : Tier.tiers_choices, 'color_choices' : Color.color_choices, 'wheel_size_choices_front' : WheelSize.wheel_size_choices, 'wheel_size_choices_back' : WheelSize.wheel_size_choices, 'country_choices' : Country.country_choices})
     
     elif request.method == "POST":

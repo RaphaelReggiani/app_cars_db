@@ -1,25 +1,41 @@
 from django.db import models
+from django.core.validators import MinLengthValidator, RegexValidator
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+import re
+from collections import Counter
+from .choices import brands, tags, tiers, colors, wheel_sizes, countries, months, days, years
+from .validators import nickname_validator, phone_validator, validate_password_rules, name_validator, email_validator
+
+
+class NewUser(models.Model):
+            
+    user_country_choices = countries
+    user_month_choices = months
+    user_day_choices = days
+    user_year_choices = years
+
+    user_nickname = models.CharField(max_length=15, unique=True, null=True, blank=True, validators=[nickname_validator], help_text="5-15 characters. Only letters and numbers. No special characters.")
+    user_password = models.CharField(max_length=10, validators=[validate_password_rules], help_text="6-10 characters. Must include 1 number, 1 special character, and no character repeated more than 2 times.")
+    user_name = models.CharField(max_length=255, unique=True, validators=[name_validator], help_text="Enter your full name. No numbers or special characters.")
+    user_email = models.EmailField(unique=True, validators=[email_validator], help_text="Required. Must be a valid email like: example@domain.com")
+    user_phone = models.CharField(max_length=15, validators=[phone_validator], null=True, blank=True, help_text="Format: +55011000000000")
+    user_age_month = models.CharField(max_length=12, choices=user_month_choices, default='January', help_text="month")
+    user_age_day = models.CharField(max_length=12, choices=user_day_choices, default='01', help_text="day")
+    user_age_year = models.CharField(max_length=12, choices=user_year_choices, default='2025', help_text="year")
+    user_country = models.CharField(max_length=50, choices=user_country_choices, help_text="Select your country of origin")
+    
+    def save(self, *args, **kwargs):
+        if self.user_name:
+            self.user_name = ' '.join([w.capitalize() for w in self.user_name.strip().split()])
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.user_name
 
 class Cars(models.Model):
 
-    brand_choices = (
-        ('Ferrari', 'Ferrari'),
-        ('Lamborghini', 'Lamborghini'),
-        ('koenigsegg', 'koenigsegg'),
-        ('Bugatti', 'Bugatti'),
-        ('McLaren', 'McLaren'),
-        ('Rolls-Royce', 'Rolls-Royce'),
-        ('Bentley', 'Bentley'),
-        ('BMW', 'BMW'),
-        ('Mercedes', 'Mercedes'),
-        ('Audi', 'Audi'),
-        ('Dodge', 'Dodge'),
-        ('Ford', 'Ford'),
-        ('Chevrolet', 'Chevrolet'),
-        ('Tesla', 'Tesla'),
-        ('BYD', 'BYD'),
-        ('Others', 'Others')
-    )
+    brand_choices = brands
 
     car_name = models.CharField(max_length=50)
     car_version = models.CharField(max_length=50)
@@ -31,106 +47,40 @@ class Cars(models.Model):
         return self.car_name
     
 class Tags(models.Model):
-    tags_choices = (
-        ('HYPER CAR', 'HYPER CAR'),
-        ('SUPER CAR', 'SUPER CAR'),
-        ('SPORT CAR', 'SPORT CAR'),
-        ('MUSCLE CAR', 'MUSCLE CAR'),
-        ('LUXURY CAR', 'LUXURY CAR'),
-        ('SUV', 'SUV'),
-        ('PICKUP', 'PICKUP'),
-        ('EV', 'EV'),
-        ('COLLECTIBLE CAR', 'COLLECTIBLE CAR'),
-        ('RACE CAR', 'RACE CAR'),
-        ('COMMON CAR', 'COMMON CAR'),
-        ('OTHERS', 'OTHERS'),
-    )
+
+    tags_choices = tags
     tags_choices_save = models.CharField(max_length=20, choices=tags_choices)
 
     def __str__(self):
         return self.tags_choices_save
     
 class Tier(models.Model):
-    tiers_choices = (
-        ('S+', 'S+'),
-        ('S', 'S'),
-        ('A+', 'A+'),
-        ('A', 'A'),
-        ('B', 'B'),
-        ('C', 'C'),
-        ('D', 'D'),
-        ('E', 'E'),
-        ('F', 'F'),
-    )
+
+    tiers_choices = tiers
     tiers_choices_save = models.CharField(max_length=10, choices=tiers_choices)
 
     def __str__(self):
         return self.tiers_choices_save
     
 class Color(models.Model):
-    color_choices = (
-        ('White', 'White'),
-        ('Black', 'Black'),
-        ('Silver', 'Silver'),
-        ('Red', 'Red'),
-        ('Light Blue', 'Light Blue'),
-        ('Blue', 'Blue'),
-        ('Navy Blue', 'Navy Blue'),
-        ('Purple', 'Purple'),
-        ('Pink', 'Pink'),
-        ('Violet', 'Violet'),
-        ('Orange', 'Orange'),
-        ('Green', 'Green'),
-        ('Gray', 'Gray'),
-        ('Gold', 'Gold'),
-        ('Wrapped', 'Wrapped'),
-        ('Exposed Carbon Fiber', 'Exposed Carbon Fiber'),
-        ('Others', 'Others'),
-    )
+
+    color_choices = colors
     color_choices_save = models.CharField(max_length=100, choices=color_choices)
 
     def __str__(self):
         return self.color_choices_save
     
 class WheelSize(models.Model):
-    wheel_size_choices = (
-        ('15"', '15"'),
-        ('16"', '16"'),
-        ('17"', '17"'),
-        ('18"', '18"'),
-        ('19"', '19"'),
-        ('20"', '20"'),
-        ('21"', '21"'),
-        ('22"', '22"'),
-        ('23"', '23"'),
-        ('24"', '24"'),
-        ('25"', '25"'),
-        ('26"', '26"'),
-        ('27"', '27"'),
-        ('28"', '28"'),
-        ('29"', '29"'),
-        ('30"', '30"'),
-        ('Others', 'Others'),
-    )
+
+    wheel_size_choices = wheel_sizes
     wheel_size_choices_save = models.CharField(max_length=10, choices=wheel_size_choices)
 
     def __str__(self):
         return self.wheel_size_choices_save
     
 class Country(models.Model):
-    country_choices = (
-        ('USA', 'USA'),
-        ('Brazil', 'Brazil'),
-        ('Canada', 'Canada'),
-        ('UK', 'UK'),
-        ('France', 'France'),
-        ('Italy', 'Italy'),
-        ('Germany', 'Germany'),
-        ('Japan', 'Japan'),
-        ('China', 'China'),
-        ('Australia', 'Australia'),
-        ('Others', 'Others'),
-    )
+
+    country_choices = countries
     country_choices_save = models.CharField(max_length=50, choices=country_choices)
 
     def __str__(self):
