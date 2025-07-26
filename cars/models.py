@@ -43,6 +43,8 @@ class Cars(models.Model):
     car_brand = models.CharField(max_length=15, choices=brand_choices) 
     car_photo = models.ImageField(upload_to='photos')
 
+    user = models.ForeignKey(NewUser, on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return self.car_name
     

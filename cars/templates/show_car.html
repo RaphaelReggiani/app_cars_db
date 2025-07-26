@@ -16,30 +16,38 @@
                     {{ car_shown_main.car_brand|upper }} {{ car_shown_main.car_name }} {{ car_shown_main.car_version }} {{ car_shown_description.car_tier }}
                 </p>
 
-                <div class="relative mt-3 mb-1 w-40 h-40">
+                <div class="relative mt-3 mb-1 w-50 h-50">
                     <img class="w-full h-full object-cover rounded-full border-4 border-purple-500 shadow-lg" src="{{ car_shown_main.car_photo.url }}" alt="Car Photo">
+                    {% if request.session.user_id == car_shown_main.user.id %}
 
-                    <a
-                        href="{% url 'car_main_edit' car_shown_main.id %}"
-                        class="absolute bottom-1 right-1 bg-gray-300 hover:bg-purple-300 text-gray-800 hover:text-white p-2 rounded-full shadow-md transition"
-                        title="Edit main info">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M4 21h4l11-11-4-4L4 17v4zM20.7 7.3c.4-.4.4-1 0-1.4l-2.6-2.6a1 1 0 00-1.4 0L15 4.6l4 4 1.7-1.3z"/>
-                        </svg>
-                    </a>
+                        <a
+                            href="{% url 'car_main_edit' car_shown_main.id %}"
+                            class="absolute bottom-1 right-1 bg-gray-300 hover:bg-purple-300 text-gray-800 hover:text-white p-2 rounded-full shadow-md transition"
+                            title="Edit main info">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M4 21h4l11-11-4-4L4 17v4zM20.7 7.3c.4-.4.4-1 0-1.4l-2.6-2.6a1 1 0 00-1.4 0L15 4.6l4 4 1.7-1.3z"/>
+                            </svg>
+                        </a>
+
+                    {% endif %}
                 </div>
 
-                <a href="{% url 'car_view' car_shown_main.id %}" 
-                    class="mt-5 inline-flex justify-center rounded-md cursor-pointer bg-purple-900 px-4 py-3 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition">
-                    UPDATE CAR INFORMATION
-                </a>
 
-                <form method="POST" action="{% url 'car_exclude' car_shown_main.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="mt-5 inline-flex cursor-pointer justify-center rounded-md bg-red-700 px-4 py-3 text-sm font-semibold text-red-100 shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
-                        EXCLUDE CAR
-                    </button>
-                </form>
+                {% if request.session.user_id == car_shown_main.user.id %}
+
+                    <a href="{% url 'car_view' car_shown_main.id %}" 
+                        class="mt-5 inline-flex justify-center rounded-md cursor-pointer bg-purple-900 px-4 py-3 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition">
+                        UPDATE CAR INFORMATION
+                    </a>
+
+                    <form method="POST" action="{% url 'car_exclude' car_shown_main.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="mt-5 inline-flex cursor-pointer justify-center rounded-md bg-red-700 px-4 py-3 text-sm font-semibold text-red-100 shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                            EXCLUDE CAR
+                        </button>
+                    </form>
+
+                {% endif %}
             </div>
 
             <div class="w-full lg:w-2/3">

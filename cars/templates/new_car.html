@@ -71,7 +71,7 @@
                         </div>
                     </div>
                         
-                    <button type="submit" class="inline-flex justify-center rounded-md bg-purple-900 mt-7 cursor-pointer px-3 py-2 w-full text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">REGISTER CAR</button>
+                    <button type="submit" id="register-car-btn" class="inline-flex justify-center rounded-md bg-purple-900 mt-7 cursor-pointer px-3 py-2 w-full text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">REGISTER CAR</button>
                 </form>
             </div>
                     
@@ -105,6 +105,21 @@
         </div>
       
     </div>
+
+<script>
+  (function(){
+    const form = document.querySelector('form');
+    const registerBtn = document.getElementById('register-car-btn');
+    const userLoggedIn = {{ request.session.user_id|default:"null" }};
+
+    form.addEventListener('submit', function(event){
+      if (!userLoggedIn) {
+        event.preventDefault();
+        alert('You must be logged to register a car.');
+      }
+    });
+  })();
+</script>
 
 {% endblock 'body' %}
 

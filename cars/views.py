@@ -2,14 +2,16 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from .models import Cars, Tags, Cardata, Tier, Color, WheelSize, Country, NewUser
 from django.contrib import messages
-from django.contrib.messages import constants
+from django.contrib.messages import constants, get_messages
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 import re
 from collections import Counter
 from django.contrib.auth.models import User
 import datetime
-from .forms import SignUpForm, LoginForm, FinalizeUserForm
+from .forms import SignUpForm, LoginForm, FinalizeUserForm, UserEditForm
+from django.contrib.auth.hashers import make_password, check_password
+
 
 
 def home(request):
@@ -85,7 +87,7 @@ def user_finalize_register(request):
                     user_age_day=pre_user_data['user_age_day'],
                     user_age_year=pre_user_data['user_age_year'],
                     user_nickname=user_nickname,
-                    user_password=form.cleaned_data['user_password'],
+                    user_password=make_password(form.cleaned_data['user_password']),
                 )
                 user.save()
 
@@ -111,17 +113,17 @@ def user_login(request):
 
         try:
             user = NewUser.objects.get(user_nickname=user_nickname)
-            if user.user_password == user_password:
+            if check_password(user_password, user.user_password):
 
                 request.session['user_id'] = user.id
                 request.session['user_nickname'] = user.user_nickname
 
-                messages.success(request, f'Welcome back, {user.user_nickname}!')
+                messages.success(request, f'Welcome back, {user.user_nickname}!', extra_tags='login')
                 return redirect('home')
             else:
-                messages.error(request, 'Incorrect password.')
+                messages.error(request, 'Incorrect password.', extra_tags='login')
         except NewUser.DoesNotExist:
-            messages.error(request, 'User not found.')
+            messages.error(request, 'User not found.', extra_tags='login')
 
     signup_form = SignUpForm(prefix='signup')
     login_form = LoginForm(prefix='login')
@@ -135,16 +137,63 @@ def user_login(request):
     })
 
 def user_logout(request):
+
     request.session.flush()
-    messages.success(request, 'You have been logged out.')
+    storage = get_messages(request)
+
+    for _ in storage:
+        pass
+
     return redirect('home')
+
+
+def user_informations(request, user_id):
+    session_user_id = request.session.get('user_id')
+    if not session_user_id:
+        messages.error(request, "You must be logged in to access this page.")
+        return redirect("user_login")
+
+    if int(session_user_id) != int(user_id):
+        messages.error(request, "You cannot access another user's profile.")
+        return redirect("home")
+
+    try:
+        user = NewUser.objects.get(id=session_user_id)
+    except NewUser.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect("home")
+
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your informations were updated successfully!")
+            return redirect('user_informations', user_id=user.id)
+        else:
+            messages.error(request, "There was an error in the form.")
+    else:
+        form = UserEditForm(instance=user)
+
+    return render(request, 'user_informations.html', {
+        'user': user,
+        'form': form,
+        'user_months': NewUser.user_month_choices,
+        'user_days': NewUser.user_day_choices,
+        'user_years': NewUser.user_year_choices,
+        'user_countries': NewUser.user_country_choices,
+    })
+
 
 def cars(request):
 
     if request.method == "GET":
         cars = Cars.objects.all()
         show_cars = Cars.objects.order_by('-id')[:4]
-        return render(request, 'new_car.html', {'car_brands': Cars.brand_choices, 'cars': cars, 'show_cars' : show_cars})
+        return render(request, 'new_car.html', {
+            'car_brands': Cars.brand_choices, 
+            'cars': cars, 
+            'show_cars' : show_cars,
+        })
     
     elif request.method == "POST":
         car_name = request.POST.get('car_name')
@@ -152,6 +201,17 @@ def cars(request):
         car_year = request.POST.get('car_year')
         car_brand = request.POST.get('car_brand')
         car_photo = request.FILES.get('car_photo')
+
+        user_id = request.session.get('user_id')
+        if not user_id:
+            messages.error(request, 'You must be logged in to register a car.')
+            return redirect('cars')
+
+        try:
+            user = NewUser.objects.get(id=user_id)
+        except NewUser.DoesNotExist:
+            messages.error(request, 'User not found. Please log in again.')
+            return redirect('cars')
 
         if len(car_name.strip()) == 0 or len(car_version.strip()) == 0 or len(car_year.strip()) == 0 or not car_photo:
             messages.add_message(request, constants.ERROR, 'All the fields needs to be filled.')
@@ -163,7 +223,8 @@ def cars(request):
             car_version=car_version,
             car_year=car_year,
             car_brand=car_brand,
-            car_photo=car_photo
+            car_photo=car_photo,
+            user=user,
         )
 
         car.save()
@@ -176,7 +237,16 @@ def car_view(request, id):
     car = Cars.objects.get(id=id)
     car_data = Cardata.objects.filter(car=car).last()
     if request.method == "GET":
-        return render(request, 'car.html', {'car' : car, 'car_data': car_data, 'tags_choices' : Tags.tags_choices, 'tiers_choices' : Tier.tiers_choices, 'color_choices' : Color.color_choices, 'wheel_size_choices_front' : WheelSize.wheel_size_choices, 'wheel_size_choices_back' : WheelSize.wheel_size_choices, 'country_choices' : Country.country_choices})
+        return render(request, 'car.html', {
+            'car' : car, 
+            'car_data': car_data, 
+            'tags_choices' : Tags.tags_choices, 
+            'tiers_choices' : Tier.tiers_choices, 
+            'color_choices' : Color.color_choices, 
+            'wheel_size_choices_front' : WheelSize.wheel_size_choices, 
+            'wheel_size_choices_back' : WheelSize.wheel_size_choices, 
+            'country_choices' : Country.country_choices,
+        })
     
     elif request.method == "POST":
         car_tier = request.POST.get('car_tier')
@@ -224,7 +294,10 @@ def show_car(request,id):
     car_shown_main = Cars.objects.get(id=id)
     car_shown_description = Cardata.objects.filter(car=car_shown_main).last()
     
-    return render(request, 'show_car.html', {'car_shown_main' : car_shown_main, 'car_shown_description' : car_shown_description})
+    return render(request, 'show_car.html', {
+        'car_shown_main' : car_shown_main, 
+        'car_shown_description' : car_shown_description,
+    })
 
 import datetime
 
@@ -285,7 +358,6 @@ def all_cars(request):
         'request': request,
     })
 
-
 def car_main_edit(request, id):
     try:
         car = Cars.objects.get(id=id)
@@ -293,7 +365,10 @@ def car_main_edit(request, id):
         raise Http404("Car not found.")
 
     if request.method == "GET":
-        return render(request, 'car_main_edit.html', {'car_brands': Cars.brand_choices, 'car': car})
+        return render(request, 'car_main_edit.html', {
+            'car_brands': Cars.brand_choices, 
+            'car': car,
+        })
 
     elif request.method == "POST":
         car_name = request.POST.get('car_name')

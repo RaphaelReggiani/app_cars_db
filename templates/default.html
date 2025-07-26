@@ -30,30 +30,56 @@
           </div>
 
           <div class="ml-2 absolute right-12 flex items-center">
-            <div class="text-purple-50 flex items-center justify-center font-bold text-sm relative group">
+            <div class="text-purple-50 font-bold text-sm relative">
               {% if request.session.user_nickname %}
-                <button class="focus:outline-none">
+
+                <button id="userMenuButton" class="flex items-center cursor-pointer focus:outline-none">
                   Welcome, {{ request.session.user_nickname }}
                   <svg class="inline w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
-                <!-- Dropdown *** AJUSTAR OS HREFS-->
-                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 text-sm text-gray-700 hidden group-hover:block z-50">
-                  <a href="{% url 'cars' %}" class="block px-4 py-2 hover:bg-purple-100 text-purple-900 font-medium">My Information</a>
-                  <a href="{% url 'cars' %}" class="block px-4 py-2 hover:bg-purple-100 text-purple-900 font-medium">My Cars</a>
+                <div id="userDropdown" class="absolute cursor-pointer left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 text-sm text-gray-700 hidden z-50">
+                  {% if request.session.user_id %}
+                    <a href="{% url 'user_informations' request.session.user_id %}" class="block px-4 py-2 hover:bg-purple-100 text-purple-900 font-medium">My Informations</a>
+                    <a href="{% url 'cars' %}" class="block px-4 py-2 hover:bg-purple-100 text-purple-900 font-medium">My Cars</a>
+                  {% endif %}
+
                   <form action="{% url 'user_logout' %}" method="post" class="block">
                     {% csrf_token %}
                     <button type="submit" class="w-full text-left px-4 py-2 hover:bg-purple-100 text-red-600 font-medium">Log Out</button>
                   </form>
                 </div>
-
               {% else %}
                 <a href="{% url 'user' %}">SIGN UP / LOG IN</a>
               {% endif %}
             </div>
           </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              const button = document.getElementById('userMenuButton');
+              const dropdown = document.getElementById('userDropdown');
+
+              button.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+              });
+
+              document.addEventListener('click', function (e) {
+                if (!dropdown.classList.contains('hidden')) {
+                  dropdown.classList.add('hidden');
+                }
+              });
+
+              dropdown.addEventListener('click', function (e) {
+                e.stopPropagation();
+              });
+            });
+          </script>
+
+
 
           <div class="hidden lg:flex lg:gap-x-12">
             <a class="text-xl font-medium text-purple-100 hover:text-purple-50 tracking-wide transition-colors duration-300">CARS DATA BASE</a>

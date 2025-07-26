@@ -58,3 +58,16 @@ class LoginForm(forms.Form):
             except NewUser.DoesNotExist:
                 raise ValidationError("User with this nickname does not exist.")
         return cleaned_data
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = NewUser
+        fields = [
+            'user_name',
+            'user_email',
+            'user_phone',
+            'user_country',
+            'user_age_month',
+            'user_age_day',
+            'user_age_year',
+        ]
