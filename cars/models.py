@@ -24,6 +24,7 @@ class NewUser(models.Model):
     user_age_day = models.CharField(max_length=12, choices=user_day_choices, default='01', help_text="day")
     user_age_year = models.CharField(max_length=12, choices=user_year_choices, default='2025', help_text="year")
     user_country = models.CharField(max_length=50, choices=user_country_choices, help_text="Select your country of origin")
+    reset_token = models.CharField(max_length=64, blank=True)
     
     def save(self, *args, **kwargs):
         if self.user_name:

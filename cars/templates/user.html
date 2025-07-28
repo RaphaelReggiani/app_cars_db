@@ -4,7 +4,7 @@
 
 {% block 'body' %}
 
-    <div class="min-h-screen flex items-center justify-center px-4 py-10 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static "images/Background_app_psicologia.jpg" %}'); background-color: rgba(255, 255, 255, 0.5); background-size: 110% 110%; background-blend-mode: overlay;">
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: 100% 100%; background-blend-mode: overlay;">
     
         <div class="py-10 sm:py-10">
             <div class="mx-auto grid max-w-7xl gap-20 px-6 lg:px-8 xl:grid-cols-2">
@@ -138,7 +138,7 @@
                                 placeholder="Insert your password"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-purple-300 placeholder:text-purple-400 placeholder:italic focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
 
-                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-purple-400 hover:text-purple-600 focus:outline-none">
+                        <button type="button" id="togglePassword" class="cursor-pointer absolute inset-y-0 right-0 pr-3 flex items-center text-purple-400 hover:text-purple-600 focus:outline-none">
 
                             <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -154,6 +154,7 @@
                                     d="M3 3l18 18" />
                             </svg>
                         </button>
+
                         </div>
 
                         <script>
@@ -173,7 +174,12 @@
                         });
                         </script>
                             
-                        <button type="submit" name="signup_submit" class="block mx-auto mt-12 w-48 rounded-md bg-purple-900 mt-12 cursor-pointer px-3 py-2 w-48 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">LOG IN</button>
+                        <button type="submit" name="signup_submit" class="block mx-auto mt-10 w-48 rounded-md bg-purple-900 cursor-pointer px-3 py-2 w-48 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">LOG IN</button>
+                    
+                        <p class="mt-6 text-sm text-purple-800">
+                            <a href="{% url 'user_forgot_password' %}" class="cursor-pointer hover:underline">* Forgot your password?</a>
+                        </p>
+                    
                     </form>
 
                 </div>
@@ -185,9 +191,7 @@
 {% endblock 'body' %}
 
 {% block 'footer' %}
-
-<footer class="bg-purple-900 text-purple-50 text-center py-4">
+<footer class="bg-red-900 text-yellow-200 text-center py-4">
   © 2025 Cars Database - All rights reserved.
 </footer>
-
 {% endblock 'footer' %}

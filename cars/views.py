@@ -11,7 +11,9 @@ from django.contrib.auth.models import User
 import datetime
 from .forms import SignUpForm, LoginForm, FinalizeUserForm, UserEditForm
 from django.contrib.auth.hashers import make_password, check_password
-
+import secrets
+from django.core.mail import send_mail
+from django.utils.http import urlencode
 
 
 def home(request):
@@ -183,6 +185,62 @@ def user_informations(request, user_id):
         'user_countries': NewUser.user_country_choices,
     })
 
+def user_forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = NewUser.objects.get(user_email=email)
+
+            token = secrets.token_urlsafe(32)
+            user.reset_token = token
+            user.save()
+
+            reset_link = request.build_absolute_uri(
+                f"/user/reset-password/?{urlencode({'token': token})}"
+            )
+
+            send_mail(
+                'Password Reset - Cars Database',
+                f'Hello {user.user_nickname},\n\nClick the link below to reset your password:\n{reset_link}',
+                'noreply@carsdatabase.com',
+                [email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "An email has been sent with password reset instructions.")
+            return redirect('user_login')
+
+        except NewUser.DoesNotExist:
+            messages.error(request, "No user found with this email.")
+
+    return render(request, 'user_forgot_password.html')
+
+def user_reset_password(request):
+    token = request.GET.get('token')
+    if not token:
+        messages.error(request, "Invalid token.")
+        return redirect("user_login")
+
+    try:
+        user = NewUser.objects.get(reset_token=token)
+    except NewUser.DoesNotExist:
+        messages.error(request, "Invalid or expired token.")
+        return redirect("user_login")
+
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+        else:
+            user.user_password = make_password(new_password)
+            user.reset_token = ''
+            user.save()
+            messages.success(request, "Password reset successful. You can now log in.")
+            return redirect("user_login")
+
+    return render(request, 'user_reset_password.html')
 
 def cars(request):
 
@@ -312,7 +370,6 @@ def all_cars(request):
     color_choices = Color.color_choices
     tag_choices = Tags.tags_choices
 
-    import datetime
     current_year = datetime.datetime.now().year
     years = ['Before 1990'] + [str(y) for y in range(1990, current_year + 1)]
 
@@ -392,4 +449,76 @@ def car_main_edit(request, id):
 
         messages.add_message(request, constants.SUCCESS, 'Informations updated successfully.')
         return redirect('car_main_edit', id=id)
+    
+def user_cars(request, user_id):
+
+    session_user_id = request.session.get('user_id')
+    if not session_user_id:
+        messages.error(request, "You must be logged in to access this page.")
+        return redirect("user_login")
+
+    if int(session_user_id) != int(user_id):
+        messages.error(request, "You cannot access another user's car list.")
+        return redirect("home")
+
+    try:
+        user = NewUser.objects.get(id=session_user_id)
+    except NewUser.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect("home")
+
+    query = request.GET.get('q', '')
+    brand = request.GET.get('brand', '')
+    year = request.GET.get('year', '')
+    color = request.GET.get('color', '')
+    type_filter = request.GET.get('type', '')
+
+    brand_choices = Cars.brand_choices
+    color_choices = Color.color_choices
+    tag_choices = Tags.tags_choices
+
+    current_year = datetime.datetime.now().year
+    years = ['Before 1990'] + [str(y) for y in range(1990, current_year + 1)]
+
+    user_car_ids_from_cardata = Cardata.objects.all()
+    if color:
+        user_car_ids_from_cardata = user_car_ids_from_cardata.filter(car_color__icontains=color)
+    if type_filter:
+        user_car_ids_from_cardata = user_car_ids_from_cardata.filter(car_tag__icontains=type_filter)
+
+    user_car_ids_from_cardata = user_car_ids_from_cardata.values_list('car_id', flat=True)
+
+    user_cars = Cars.objects.filter(user=user)
+
+    if query:
+        user_cars = user_cars.filter(
+            Q(car_name__icontains=query) |
+            Q(car_brand__icontains=query) |
+            Q(car_year__icontains=query)
+        )
+
+    if brand:
+        user_cars = user_cars.filter(car_brand=brand)
+
+    if year:
+        if year == 'Before 1990':
+            user_cars = user_cars.filter(car_year__lt='1990')
+        else:
+            user_cars = user_cars.filter(car_year=year)
+
+    if color or type_filter:
+        user_cars = user_cars.filter(id__in=user_car_ids_from_cardata)
+
+    user_cars = user_cars.distinct().order_by('-id')
+
+    return render(request, 'user_cars.html', {
+        'car_main': user_cars,
+        'car_information': Cardata.objects.filter(car_id__in=user_cars).order_by('-id'),
+        'query': query,
+        'brand_choices': brand_choices,
+        'color_choices': color_choices,
+        'tag_choices': tag_choices,
+        'years': years,
+        'request': request,
+    })
 
