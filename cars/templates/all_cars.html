@@ -3,14 +3,14 @@
 {% load static %}
 
 {% block 'body' %}
-<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: 100% 100%; background-blend-mode: overlay;">
+<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: cover; background-blend-mode: overlay;">
     <div class="w-full flex flex-col items-center">
         <h2 class="ml-5 text-pretty text-3xl flex items-left justify-left font-semibold tracking-tight text-yellow-400 sm:text-4xl">
             REGISTERED CARS
         </h2>
 
         <form method="GET" action="{% url 'all_cars' %}" class="w-3/4 flex items-center mb-8 relative">
-            <button type="button" id="filter-toggle" aria-label="Toggle filters" class="mt-12 mr-3 cursor-pointer text-red-700 hover:text-red-900 focus:outline-none">
+            <button type="button" id="filter-toggle" aria-label="Toggle filters" class="mt-12 mr-3 cursor-pointer text-red-700 hover:text-red-500 focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-3.586L3.293 6.707A1 1 0 013 6V4z"/>
                 </svg>
@@ -33,7 +33,7 @@
 
                     <div>
                         <label for="brand" class="block font-medium text-red-700 mb-1">BRAND:</label>
-                        <select name="brand" id="brand" class="cursor-pointer w-full rounded border border-yellow-400 px-3 py-2 text-red-900">
+                        <select name="brand" id="brand" class="cursor-pointer w-full bg-yellow-50 rounded border border-yellow-400 px-3 py-2 text-red-900">
                             <option value="">All Brands</option>
                             {% for brand_value, brand_name in brand_choices %}
                             <option value="{{ brand_value }}" {% if request.GET.brand == brand_value %}selected{% endif %}>{{ brand_name }}</option>
@@ -43,7 +43,7 @@
 
                     <div>
                         <label for="year" class="block font-medium text-red-700 mb-1">YEAR:</label>
-                        <select name="year" id="year" class="cursor-pointer w-full rounded border border-yellow-400 px-3 py-2 text-red-900">
+                        <select name="year" id="year" class="cursor-pointer w-full bg-yellow-50 rounded border border-yellow-400 px-3 py-2 text-red-900">
                             <option value="">All Years</option>
                             {% for year in years %}
                             <option value="{{ year }}" {% if request.GET.year == year %}selected{% endif %}>{{ year }}</option>
@@ -53,7 +53,7 @@
 
                     <div>
                         <label for="color" class="block font-medium text-red-700 mb-1">COLOR:</label>
-                        <select name="color" id="color" class="cursor-pointer w-full rounded border border-yellow-400 px-3 py-2 text-red-900">
+                        <select name="color" id="color" class="cursor-pointer w-full bg-yellow-50 rounded border border-yellow-400 px-3 py-2 text-red-900">
                             <option value="">All Colors</option>
                             {% for color_value, color_name in color_choices %}
                             <option value="{{ color_value }}" {% if request.GET.color == color_value %}selected{% endif %}>{{ color_name }}</option>
@@ -63,7 +63,7 @@
 
                     <div>
                         <label for="type" class="block font-medium text-red-700 mb-1">TYPE:</label>
-                        <select name="type" id="type" class="cursor-pointer w-full rounded border border-yellow-400 px-3 py-2 text-red-900">
+                        <select name="type" id="type" class="cursor-pointer w-full bg-yellow-50 rounded border border-yellow-400 px-3 py-2 text-red-900">
                             <option value="">All Types</option>
                             {% for tag_value, tag_name in tag_choices %}
                             <option value="{{ tag_value }}" {% if request.GET.type == tag_value %}selected{% endif %}>{{ tag_name }}</option>
@@ -72,15 +72,15 @@
                     </div>
 
                     <div class="mt-6 flex justify-end gap-3">
-                        <button type="submit" class="cursor-pointer rounded bg-red-800 px-4 py-2 text-yellow-200 hover:bg-red-700">Apply Filters</button>
-                        <button type="button" id="filter-cancel" class="cursor-pointer rounded border border-yellow-300 px-4 py-2 hover:bg-yellow-100">Cancel</button>
+                        <button type="submit" class="cursor-pointer rounded bg-red-700 px-4 py-2 text-yellow-300 hover:bg-red-500">Apply Filters</button>
+                        <button type="button" id="filter-cancel" class="cursor-pointer rounded border bg-yellow-50 text-red-900 border-yellow-300 px-4 py-2 hover:bg-yellow-100">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="mt-6 mb-5 flex flex-col gap-1 w-3/4">
-            <hr class="border-t-2 border-yellow-800">
+            <hr class="border-t-2 border-red-800">
             <hr class="border-t-2 border-yellow-400">
         </div>
 
@@ -88,7 +88,7 @@
             {% for car in car_main %}
             <li>
                 <div class="px-12 flex items-center gap-x-6">
-                    <img class="size-35 rounded-full border-3 border-yellow-500 shadow-lg" src="{{car.car_photo.url}}" alt="">
+                    <img class="w-36 h-36 object-cover rounded-full border-3 border-yellow-500 shadow-lg" src="{{car.car_photo.url}}" alt="">
                     <div>
                         <a href="{% url 'show_car' car.id %}"
                            class="text-base/7 font-semibold tracking-tight text-red-800">{{car.car_name}}</a>

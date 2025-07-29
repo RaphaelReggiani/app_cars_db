@@ -4,24 +4,24 @@
 
 {% block 'body' %}
 
-<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: 100% 100%; background-blend-mode: overlay;">
+<div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: cover; background-blend-mode: overlay;">
 
     <div class="mt-5 max-w-6xl mx-auto px-4 lg:px-8 py-8">
 
-        <div class="ml-10 flex flex-col lg:flex-row items-center gap-30">
+        <div class="ml-10 flex flex-col lg:flex-row items-start gap-20 max-w-5xl mx-auto">
 
             <div class="flex flex-col items-center">
-                <p class="mt-3 text-3xl font-semibold tracking-tight text-purple-800 leading-relaxed text-center">
-                    {{ car_shown_main.car_brand|upper }} {{ car_shown_main.car_name }} {{ car_shown_main.car_version }} {{ car_shown_description.car_tier }}
+                <p class="mt-3 text-3xl font-semibold tracking-tight text-red-800 leading-relaxed text-center">
+                    {{ car_shown_main.car_brand|upper }} | {{ car_shown_main.car_name }}
                 </p>
 
-                <div class="relative mt-3 mb-1 w-50 h-50">
-                    <img class="w-full h-full object-cover rounded-full border-4 border-purple-500 shadow-lg" src="{{ car_shown_main.car_photo.url }}" alt="Car Photo">
+                <div class="relative mt-4 mb-1 w-50 h-50">
+                    <img class="w-full h-full object-cover rounded-full border-4 border-yellow-500 shadow-lg" src="{{ car_shown_main.car_photo.url }}" alt="Car Photo">
                     {% if request.session.user_id == car_shown_main.user.id %}
 
                         <a
                             href="{% url 'car_main_edit' car_shown_main.id %}"
-                            class="absolute bottom-1 right-1 bg-gray-300 hover:bg-purple-300 text-gray-800 hover:text-white p-2 rounded-full shadow-md transition"
+                            class="absolute bottom-1 right-1 bg-yellow-100 hover:bg-red-500 text-red-700 hover:text-red-800 p-2 rounded-full shadow-md transition"
                             title="Edit main info">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M4 21h4l11-11-4-4L4 17v4zM20.7 7.3c.4-.4.4-1 0-1.4l-2.6-2.6a1 1 0 00-1.4 0L15 4.6l4 4 1.7-1.3z"/>
@@ -34,14 +34,13 @@
 
                 {% if request.session.user_id == car_shown_main.user.id %}
 
-                    <a href="{% url 'car_view' car_shown_main.id %}" 
-                        class="mt-5 inline-flex justify-center rounded-md cursor-pointer bg-purple-900 px-4 py-3 text-sm font-semibold text-purple-100 shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition">
+                    <a href="{% url 'car_view' car_shown_main.id %}" class="mt-5 inline-flex justify-center rounded-md cursor-pointer bg-red-700 px-4 py-3 text-sm font-semibold text-yellow-300 hover:bg-red-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition">
                         UPDATE CAR INFORMATION
                     </a>
 
                     <form method="POST" action="{% url 'car_exclude' car_shown_main.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="mt-5 inline-flex cursor-pointer justify-center rounded-md bg-red-700 px-4 py-3 text-sm font-semibold text-red-100 shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                        <button type="submit" class="mt-5 inline-flex cursor-pointer justify-center rounded-md bg-red-700 px-4 py-3 text-sm font-semibold text-red-100 shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
                             EXCLUDE CAR
                         </button>
                     </form>
@@ -49,38 +48,40 @@
                 {% endif %}
             </div>
 
-            <div class="w-full lg:w-2/3">
+            <div class="w-full lg:w-[600px]">
                 {% if car_shown_description.car_file and car_shown_description.car_file.name %}
-                    <video width="520" height="280" class="rounded-lg shadow-md" controls>
-                        <source src="{{ car_shown_description.car_file.url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <div class="mt-6 aspect-video flex flex-col items-center justify-center text-yellow-400">
+                        <video width="520" height="280" class="rounded-lg shadow-md" controls>
+                            <source src="{{ car_shown_description.car_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
                 {% else %}
-                    <div class="mt-6 flex flex-col items-center justify-center text-purple-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="aspect-video flex flex-col items-center justify-center text-yellow-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 9.75L14.25 12l-4.5 2.25V9.75zM3 5.25C3 4.007 4.007 3 5.25 3h13.5C19.993 3 21 4.007 21 5.25v13.5c0 1.243-1.007 2.25-2.25 2.25H5.25A2.25 2.25 0 013 18.75V5.25z" />
                         </svg>
-                        <p class="text-sm italic font-medium text-purple-600">No media uploaded.</p>
+                        <p class="text-sm italic font-medium text-yellow-400">No media uploaded.</p>
                     </div>
                 {% endif %}
             </div>
         </div>
 
         <div class="mt-12 mb-1 flex flex-col gap-1 w-full">
-            <hr class="border-t-2 border-purple-800">
-            <hr class="border-t-2 border-purple-400">
+            <hr class="border-t-2 border-red-800">
+            <hr class="border-t-2 border-yellow-400">
         </div>
 
         <div class="flex justify-center mt-20">
-            <table class="w-1/2 rounded-lg shadow bg-purple-50 divide-y divide-purple-300">
-                <tbody class="divide-y divide-purple-500">
-                    <tr class="bg-purple-300">
-                        <td colspan="2" class="py-3 text-center text-sm font-semibold text-purple-900">CAR INFORMATIONS</td>
+            <table class="w-3/5 rounded-lg shadow bg-yellow-100 divide-y divide-red-900">
+                <tbody class="divide-y divide-red-900">
+                    <tr class="bg-yellow-500">
+                        <td colspan="2" class="py-3 text-center text-sm font-semibold text-red-700">CAR INFORMATIONS</td>
                     </tr>
 
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">CAR NAME</td>
-                            <td class="p-4 pl-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">CAR NAME</td>
+                            <td class="p-4 pl-4 text-sm text-red-700">
                                 {% if car_shown_main.car_name %}
                                     {{ car_shown_main.car_name }}
                                 {% else %}
@@ -89,8 +90,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">BRAND</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">BRAND</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_main.car_brand %}
                                     {{ car_shown_main.car_brand }}
                                 {% else %}
@@ -99,8 +100,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">VERSION</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">VERSION</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_main.car_version %}
                                     {{ car_shown_main.car_version }}
                                 {% else %}
@@ -109,8 +110,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">YEAR</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">YEAR</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_main.car_year %}
                                     {{ car_shown_main.car_year }}
                                 {% else %}
@@ -119,8 +120,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">COUNTRY OF ORIGIN</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">COUNTRY OF ORIGIN</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_country %}
                                     {{ car_shown_description.car_country }}
                                 {% else %}
@@ -129,8 +130,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">TIER</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">TIER</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_tier %}
                                     {{ car_shown_description.car_tier }}
                                 {% else %}
@@ -139,8 +140,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">TAG</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">TAG</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_tag %}
                                     {{ car_shown_description.car_tag }}
                                 {% else %}
@@ -149,8 +150,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">MAIN COLOR</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">MAIN COLOR</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_color %}
                                     {{ car_shown_description.car_color }}
                                 {% else %}
@@ -159,8 +160,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">FRONT WHEEL SIZE</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">FRONT WHEEL SIZE</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_wheel_size_front %}
                                     {{ car_shown_description.car_wheel_size_front }}
                                 {% else %}
@@ -169,8 +170,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">BACK WHEEL SIZE</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">BACK WHEEL SIZE</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_wheel_size_back %}
                                     {{ car_shown_description.car_wheel_size_back }}
                                 {% else %}
@@ -179,8 +180,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">POWER</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">POWER</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_power %}
                                     {{ car_shown_description.car_power }}
                                 {% else %}
@@ -189,8 +190,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">TORQUE</td>
-                            <td class="p-4 text-sm text-purple-700">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">TORQUE</td>
+                            <td class="p-4 text-sm text-red-700">
                                 {% if car_shown_description.car_torque %}
                                     {{ car_shown_description.car_torque }}
                                 {% else %}
@@ -199,8 +200,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-purple-900 border-r border-purple-300">DESCRIPTION</td>
-                            <td wrap="soft" class="p-4 text-sm text-purple-700 break-words">
+                            <td class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-red-800 border-r border-red-900">DESCRIPTION</td>
+                            <td wrap="soft" class="p-4 text-sm text-red-700 break-words">
                                 {% if car_shown_description.description %}
                                     {{ car_shown_description.description }}
                                 {% else %}

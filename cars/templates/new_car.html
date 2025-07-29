@@ -4,7 +4,7 @@
 
 {% block 'body' %}
 
-    <div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: 100% 100%; background-blend-mode: overlay;">
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 bg-center bg-no-repeat bg-cover" style="background-image: url('{% static 'images/car_image_carsdb.jpg' %}'); background-color: rgba(255, 255, 255, 0.65); background-size: cover; background-blend-mode: overlay;">
     
         <div class="py-10 sm:py-10">
             <div class="mx-auto grid max-w-7xl gap-20 px-6 lg:px-8 xl:grid-cols-2">
@@ -77,14 +77,14 @@
                     
                 <div class="w-full">
 
-                    <h2 class="ml-5 text-pretty text-3xl flex items-left justify-left font-semibold tracking-tight text-yellow-400 sm:text-4xl">LATEST REGISTERED CARS</h2>
+                    <h2 class="ml-12 text-pretty text-3xl flex items-left justify-left font-semibold tracking-tight text-yellow-400 sm:text-4xl">LATEST REGISTERED CARS</h2>
 
                     <ul role="list" class="ml-5 mt-20 grid gap-x-20 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
 
                     {% for car in show_cars %}
                         <li>
                         <div class="px-12 flex items-center gap-x-6">
-                            <img class="size-35 rounded-full border-3 border-yellow-500 shadow-lg" src="{{car.car_photo.url}}" alt="">
+                            <img class="w-36 h-36 object-cover rounded-full border-3 border-yellow-500 shadow-lg" src="{{car.car_photo.url}}" alt="">
                             <div>
                             <a href="{% url 'show_car' car.id %}" class="text-base/7 font-semibold tracking-tight text-red-800">{{car.car_name}}</a>
                             <p class="text-sm/6 font-semibold text-red-700">{{car.car_brand|upper}}</p>
