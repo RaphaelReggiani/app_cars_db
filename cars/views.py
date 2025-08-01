@@ -1,20 +1,17 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
-from .models import Cars, Tags, Cardata, Tier, Color, WheelSize, Country, NewUser
+from .models import Cars, Cardata, NewUser
 from django.contrib import messages
 from django.contrib.messages import constants, get_messages
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-import re
+import re, datetime, secrets
 from collections import Counter
 from django.contrib.auth.models import User
-import datetime
-from .forms import SignUpForm, LoginForm, FinalizeUserForm, UserEditForm
+from .forms import SignUpForm, LoginForm, FinalizeUserForm, UserEditForm, CarForm
 from django.contrib.auth.hashers import make_password, check_password
-import secrets
 from django.core.mail import send_mail
 from django.utils.http import urlencode
-
 
 def home(request):
     return render(request, 'home.html')
@@ -62,7 +59,6 @@ def user_pre_register(request):
             })
     return redirect('user')
 
-
 def user_finalize_register(request):
     pre_user_data = request.session.get('pre_user_data')
     if not pre_user_data:
@@ -104,10 +100,6 @@ def user_finalize_register(request):
 
     return render(request, 'user_register.html', {'form': form, 'success': success})
 
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from .models import NewUser
-
 def user_login(request):
     if request.method == 'POST':
         user_nickname = request.POST.get('user_nickname')
@@ -147,7 +139,6 @@ def user_logout(request):
         pass
 
     return redirect('home')
-
 
 def user_informations(request, user_id):
     session_user_id = request.session.get('user_id')
@@ -243,52 +234,37 @@ def user_reset_password(request):
     return render(request, 'user_reset_password.html')
 
 def cars(request):
-
     if request.method == "GET":
+        form = CarForm()
         cars = Cars.objects.all()
         show_cars = Cars.objects.order_by('-id')[:4]
         return render(request, 'new_car.html', {
-            'car_brands': Cars.brand_choices, 
-            'cars': cars, 
-            'show_cars' : show_cars,
+            'form': form,
+            'cars': cars,
+            'show_cars': show_cars,
+            'car_brands': Cars.brand_choices,
         })
-    
+
     elif request.method == "POST":
-        car_name = request.POST.get('car_name')
-        car_version = request.POST.get('car_version')
-        car_year = request.POST.get('car_year')
-        car_brand = request.POST.get('car_brand')
-        car_photo = request.FILES.get('car_photo')
+        form = CarForm(request.POST, request.FILES)
 
         user_id = request.session.get('user_id')
         if not user_id:
             messages.error(request, 'You must be logged in to register a car.')
             return redirect('cars')
 
-        try:
-            user = NewUser.objects.get(id=user_id)
-        except NewUser.DoesNotExist:
-            messages.error(request, 'User not found. Please log in again.')
-            return redirect('cars')
+        if form.is_valid():
+            car = form.save(commit=False)
+            try:
+                user = NewUser.objects.get(id=user_id)
+                car.user = user
+                car.save()
+                messages.success(request, 'Registration completed successfully.')
+            except NewUser.DoesNotExist:
+                messages.error(request, 'User not found. Please log in again.')
+        else:
+            messages.error(request, 'Please correct the errors below.')
 
-        if len(car_name.strip()) == 0 or len(car_version.strip()) == 0 or len(car_year.strip()) == 0 or not car_photo:
-            messages.add_message(request, constants.ERROR, 'All the fields needs to be filled.')
-            return redirect('cars')
-
-        car = Cars(
-                
-            car_name=car_name,
-            car_version=car_version,
-            car_year=car_year,
-            car_brand=car_brand,
-            car_photo=car_photo,
-            user=user,
-        )
-
-        car.save()
-            
-        messages.add_message(request, constants.SUCCESS, 'Registration completed successfully.')
-            
         return redirect('cars')
 
 def car_view(request, id):
@@ -298,12 +274,12 @@ def car_view(request, id):
         return render(request, 'car.html', {
             'car' : car, 
             'car_data': car_data, 
-            'tags_choices' : Tags.tags_choices, 
-            'tiers_choices' : Tier.tiers_choices, 
-            'color_choices' : Color.color_choices, 
-            'wheel_size_choices_front' : WheelSize.wheel_size_choices, 
-            'wheel_size_choices_back' : WheelSize.wheel_size_choices, 
-            'country_choices' : Country.country_choices,
+            'tags_choices' : Cardata.tags_cars_choices, 
+            'tiers_choices' : Cardata.tiers_cars_choices, 
+            'color_choices' : Cardata.color_cars_choices, 
+            'wheel_size_choices_front' : Cardata.wheel_size_cars_choices, 
+            'wheel_size_choices_back' : Cardata.wheel_size_cars_choices, 
+            'country_choices' : Cardata.country_cars_choices,
         })
     
     elif request.method == "POST":
@@ -367,8 +343,8 @@ def all_cars(request):
     type_filter = request.GET.get('type', '')
 
     brand_choices = Cars.brand_choices
-    color_choices = Color.color_choices
-    tag_choices = Tags.tags_choices
+    color_choices = Cardata.color_cars_choices
+    tag_choices = Cardata.tags_cars_choices
 
     current_year = datetime.datetime.now().year
     years = ['Before 1990'] + [str(y) for y in range(1990, current_year + 1)]
@@ -474,8 +450,8 @@ def user_cars(request, user_id):
     type_filter = request.GET.get('type', '')
 
     brand_choices = Cars.brand_choices
-    color_choices = Color.color_choices
-    tag_choices = Tags.tags_choices
+    color_choices = Cardata.color_cars_choices
+    tag_choices = Cardata.tags_cars_choices
 
     current_year = datetime.datetime.now().year
     years = ['Before 1990'] + [str(y) for y in range(1990, current_year + 1)]

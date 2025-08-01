@@ -1,5 +1,4 @@
-import pycountry
-import datetime
+import pycountry, datetime
 
 months = (
     ('January', 'January'),
@@ -106,7 +105,6 @@ wheel_sizes = (
     ('30"', '30"'),
     ('Others', 'Others'),
 )
-
 
 countries = sorted(
     [(country.name, country.name) for country in pycountry.countries],

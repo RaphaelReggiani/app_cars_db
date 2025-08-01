@@ -7,7 +7,6 @@ from collections import Counter
 from .choices import brands, tags, tiers, colors, wheel_sizes, countries, months, days, years
 from .validators import nickname_validator, phone_validator, validate_password_rules, name_validator, email_validator
 
-
 class NewUser(models.Model):
             
     user_country_choices = countries
@@ -48,54 +47,16 @@ class Cars(models.Model):
 
     def __str__(self):
         return self.car_name
-    
-class Tags(models.Model):
-
-    tags_choices = tags
-    tags_choices_save = models.CharField(max_length=20, choices=tags_choices)
-
-    def __str__(self):
-        return self.tags_choices_save
-    
-class Tier(models.Model):
-
-    tiers_choices = tiers
-    tiers_choices_save = models.CharField(max_length=10, choices=tiers_choices)
-
-    def __str__(self):
-        return self.tiers_choices_save
-    
-class Color(models.Model):
-
-    color_choices = colors
-    color_choices_save = models.CharField(max_length=100, choices=color_choices)
-
-    def __str__(self):
-        return self.color_choices_save
-    
-class WheelSize(models.Model):
-
-    wheel_size_choices = wheel_sizes
-    wheel_size_choices_save = models.CharField(max_length=10, choices=wheel_size_choices)
-
-    def __str__(self):
-        return self.wheel_size_choices_save
-    
-class Country(models.Model):
-
-    country_choices = countries
-    country_choices_save = models.CharField(max_length=50, choices=country_choices)
-
-    def __str__(self):
-        return self.country_choices_save
 
 class Cardata(models.Model):
+
     car_name_data = Cars.car_name
-    tiers_cars_choices = Tier.tiers_choices
-    tags_cars_choices = Tags.tags_choices
-    color_cars_choices = Color.color_choices
-    wheel_size_cars_choices = WheelSize.wheel_size_choices
-    country_cars_choices = Country.country_choices
+    tiers_cars_choices = tiers
+    tags_cars_choices = tags
+    color_cars_choices = colors
+    wheel_size_cars_choices = wheel_sizes
+    country_cars_choices = countries
+
     car_tier = models.CharField(max_length=10, choices=tiers_cars_choices, null=True, blank=True) 
     car_tag = models.CharField(max_length=20, choices=tags_cars_choices, null=True, blank=True)
     car_power = models.CharField(max_length=5, null=True)

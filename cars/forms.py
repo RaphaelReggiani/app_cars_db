@@ -1,13 +1,11 @@
 from django import forms
-from .models import NewUser
+from .models import NewUser, Cars, Cardata
 from django.core.exceptions import ValidationError
-
 
 class SignUpForm(forms.ModelForm):
     class Meta:
         model = NewUser
         fields = ['user_name', 'user_email', 'user_phone', 'user_age_month', 'user_age_day', 'user_age_year', 'user_country']
-
 
 class FinalizeUserForm(forms.ModelForm):
     user_password = forms.CharField(
@@ -71,3 +69,14 @@ class UserEditForm(forms.ModelForm):
             'user_age_day',
             'user_age_year',
         ]
+
+class CarForm(forms.ModelForm):
+    class Meta:
+        model = Cars
+        fields = ['car_name', 'car_version', 'car_year', 'car_brand', 'car_photo']
+        widgets = {
+            'car_name': forms.TextInput(attrs={'placeholder': 'Enter car name'}),
+            'car_version': forms.TextInput(attrs={'placeholder': 'Enter car version'}),
+            'car_year': forms.NumberInput(attrs={'placeholder': 'Year'}),
+            'car_brand': forms.Select(),
+        }

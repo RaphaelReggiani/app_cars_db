@@ -20,7 +20,6 @@ def validate_password_rules(value):
         if count > 2:
             raise ValidationError(f"Character '{char}' is repeated more than twice.")
         
-        
 def name_validator(value):
     if not value or value.strip() == "":
         raise ValidationError("Name cannot be empty.")
@@ -53,7 +52,6 @@ def email_validator(value):
 
     if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", value):
         raise ValidationError("Enter a valid email address.")
-
 
 nickname_validator = RegexValidator(
     regex=r'^[a-zA-Z0-9]{5,15}$',
