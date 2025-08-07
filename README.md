@@ -1,6 +1,6 @@
 # Cars Database Application (EN-US)
 
-Aplicação desenvolvida com **Python** e **Django**, utilizando **HTML** e **CSS**, pronta para deploy. O sistema permite o controle e o acompanhamento de usuários e carros registrados.
+Aplicação desenvolvida com **Python**, **Django** e **Django REST Framework** (Inclui API com autenticação via token para acesso seguro aos dados dos carros), utilizando **HTML** e **CSS**, pronta para deploy. O sistema permite o controle e o acompanhamento de usuários e carros registrados.
 
 ## 🔧 Funcionalidades
 

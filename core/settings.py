@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cars',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -135,4 +136,10 @@ from django.contrib.messages import constants
 MESSAGE_TAGS = {
     constants.SUCCESS : 'bg-green-100 text-green-700',
     constants.ERROR : 'bg-red-100 text-red-700',
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
 }
