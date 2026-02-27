@@ -1,6 +1,49 @@
 # Cars Database Application (EN-US)
 
-Aplicação desenvolvida com **Python**, **Django** e **Django REST Framework** (Inclui API com autenticação via token para acesso seguro aos dados dos carros), utilizando **HTML** e **CSS**, pronta para deploy. O sistema permite o controle e o acompanhamento de usuários e carros registrados.
+![Python](https://img.shields.io/badge/Python-3.13-blue?style=flat)
+![Django](https://img.shields.io/badge/Django-4.2-green?style=flat)
+![DRF](https://img.shields.io/badge/DRF-3.14-red?style=flat)
+
+Sistema fullstack para o controle e o acompanhamento de usuários e carros registrados, com controle de permissões baseado em roles e API REST autenticada.
+
+## Instalação
+
+```bash
+git clone https://github.com/RaphaelReggiani/app_cars_db
+python -m venv venv
+source venv/bin/activate  # ou venv\Scripts\activate no Windows
+python manage.py migrate
+python manage.py runserver
+```
+
+## Estrutura do Projeto
+
+```bash
+app_cars_db/
+├── core/
+│   ├── settings.py
+│   └── urls.py
+│
+├── cars/
+│   ├── urls.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── choices.py
+│   ├── validators.py
+│   ├── api_views.py
+│   ├── api_urls.py
+│   ├── serializers.py
+```
+
+## Stack Utilizada
+
+- Python 3.13.4;
+- Django;
+- Django REST Framework (DRF);
+- MySQL;
+- HTML5 + CSS3;
+- Autenticação via TokenAuthentication (DRF).
 
 ## 🔧 Funcionalidades
 
